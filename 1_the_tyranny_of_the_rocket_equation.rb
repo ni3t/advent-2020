@@ -8,7 +8,7 @@ def calculate_fuel mod
 end
 
 until fuels.sum.zero?
-  fuels.map! { |f| calculate_fuel(f) }
+  fuels.map!(&method(:calculate_fuel))
   answer1 ||= fuels.sum 
   answer2 += fuels.sum
 end

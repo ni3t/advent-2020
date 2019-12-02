@@ -1,3 +1,5 @@
+require_relative "lib/intcode.rb"
+
 @program = DATA.each_line.first.split(?,).map(&:to_i)
 
 @answer1 = nil
@@ -6,23 +8,15 @@
 catch :done do
   0.step(to: 99) do |a|
     0.step(to: 99) do |b|
-      clone = @program.clone
-      clone[1..2] = [a,b]
-      0.step(by: 4, to: @program.length) do |i|
-        if clone[i] == 1
-          clone[clone[i+3]] = clone[clone[i+1]] + clone[clone[i+2]]
-        elsif clone[i] == 2
-          clone[clone[i+3]] = clone[clone[i+1]] * clone[clone[i+2]]
-        elsif clone[i] == 99
-          break
-        end
-        if clone.first == 19690720
-          @answer2 = (100 * a) + b
-          throw :done if @answer1 && @answer2
-        end
+      memory = @program.clone
+      memory[1,2] = [a,b]
+      result = Intcode.new(memory).run.memory
+      if result.first == 19690720
+        @answer2 = (100 * a) + b
+        throw :done if @answer1 && @answer2
       end
       if a == 12 && b == 2
-        @answer1 = clone.first
+        @answer1 = result.first
         throw :done if @answer1 && @answer2
       end
     end
