@@ -23,6 +23,10 @@ end
 
 def get_title
   content = HTTParty.get("https://adventofcode.com/2019/day/#{@day}")
+  if content.body =~ /Please don't repeatedly/
+    puts "NOT YET SIR"
+    exit
+  end
   title = Nokogiri::HTML(content).css("article h2").text
   filename = title.split(":").last[0..-4]
   filename.strip.split(" ").map(&:downcase).unshift(@day).join("_") + ".rb"
@@ -40,6 +44,7 @@ def create_file
   ensure
     file.close
   end
+  puts "OK GO!"
 end
 
 create_file
