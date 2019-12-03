@@ -1,79 +1,48 @@
-@answer1 = nil
-@answer2 = nil
+wires = DATA.each_line.first(2).map{ @1.split(",").map(&:chomp).freeze }.freeze
 
-firstwire, secondwire = DATA.each_line.first(2).map{ @1.split(",").map(&:chomp) }
+class Array
+  def manhattan_distance(from = nil)
+    map.with_index do |val, i|
+      (from ? from[i] - val : val).abs
+    end.sum
+  end
+end
 
-@loc1 = [0,0]
-@loc1s = []
-@loc2 = [0,0]
-@loc2s = []
+def move(dir, pos)
+  case dir
+  when ?R; pos[0] += 1 
+  when ?L; pos[0] -= 1 
+  when ?U; pos[1] += 1 
+  when ?D; pos[1] -= 1
+  end
+end
 
-firstwire.map do |instruction|
-  dir, dist = instruction[0], instruction[1..-1].to_i
-  until dist == 0
-    if dir == ?R
-      @loc1[0] += 1
+curpos = [[0,0],[0,0]]
+paths = [[],[]]
+
+wires.map.with_index do |lines,i|
+  lines.map do |line|
+    dir, *dist = line.chars
+    dist = dist.join.to_i
+    until dist == 0
+      move(dir, curpos[i])
       dist -= 1
-      @loc1s << @loc1.clone
-    end
-    if dir == ?L
-      @loc1[0] -= 1
-      dist -= 1
-      @loc1s << @loc1.clone
-    end
-    if dir == ?U
-      @loc1[1] += 1
-      dist -= 1
-      @loc1s << @loc1.clone
-    end
-    if dir == ?D
-      @loc1[1] -= 1
-      dist -= 1
-      @loc1s << @loc1.clone
+      paths[i] << curpos[i].clone
     end
   end
 end
 
-secondwire.map do |instruction|
-  dir, dist = instruction[0], instruction[1..-1].to_i
-  until dist == 0
-    if dir == ?R
-      @loc2[0] += 1
-      dist -= 1
-      @loc2s << @loc2.clone
-    end
-    if dir == ?L
-      @loc2[0] -= 1
-      dist -= 1
-      @loc2s << @loc2.clone
-    end
-    if dir == ?U
-      @loc2[1] += 1
-      dist -= 1
-      @loc2s << @loc2.clone
-    end
-    if dir == ?D
-      @loc2[1] -= 1
-      dist -= 1
-      @loc2s << @loc2.clone
-    end
-  end
+intersects = paths.reduce(&:&)
+a1, a2 = nil
+INF = Float::INFINITY
+intersects.each do |int|
+  x,y = int
+  a1 = [a1 || INF, int.manhattan_distance].min
+  a2 = [a2 || INF, paths.map { |p| p.index([x,y]) }.sum].min
 end
 
-intersects = @loc1s & @loc2s
-
-@answer1 = intersects.min_by { |x,y| x.abs + y.abs }.map(&:abs).sum
-
-intersect_signals = intersects.map do |x,y|
-  dist1 = @loc1s.index([x,y]) + 1
-  dist2 = @loc2s.index([x,y]) + 1
-  [dist1, dist2]
-end
-
-@answer2 = intersect_signals.sort_by(&:sum).first.sum
-
-pp @answer1
-pp @answer2
+pp a1
+pp a2
 
 __END__
 R1008,U336,R184,D967,R451,D742,L235,U219,R57,D439,R869,U207,L574,U670,L808,D675,L203,D370,L279,U448,L890,U297,R279,D613,L411,D530,L372,D88,R986,U444,R319,D95,L385,D674,R887,U855,R794,U783,R633,U167,L587,D545,L726,D196,R681,U609,R677,U881,R153,D724,L63,U246,R343,U315,R580,U872,L516,U95,R463,D809,R9,U739,R540,U670,L434,D699,L158,U47,L383,D483,L341,U61,R933,D269,R816,D589,R488,D169,R972,D534,L995,D277,L887,D657,R628,D322,R753,U813,L284,D237,R676,D880,L50,D965,L401,D619,R858,U313,L156,U535,R664,U447,L251,U168,L352,U881,L734,U270,L177,D903,L114,U998,L102,D149,R848,D586,L98,D157,R942,U496,R857,U362,R398,U86,R469,U358,L721,D631,R176,D365,L112,U472,L557,D153,R97,D639,L457,U566,R570,U106,R504,D292,L94,U499,R358,U653,L704,D627,R544,D24,L407,U513,R28,U643,L510,U579,R825,D376,L867,U999,R134,D734,R654,D989,L920,U872,R64,U626,R751,D425,R620,U274,L471,D83,R979,U577,L43,D320,R673,D187,R300,U134,L451,D717,R857,U576,R570,U988,R745,U840,R799,U809,R573,U354,L208,D976,L417,U473,L555,U563,L955,U823,R712,D869,L145,D735,L780,D74,R421,U42,L158,U689,R718,D455,L670,U128,L744,U401,R149,U102,L122,U832,R872,D40,R45,D325,L553,U980,L565,D497,L435,U647,L209,D822,L593,D28,R936,U95,R349,U511,L243,U895,R421,U336,L986,U264,R376,D183,R480,D947,R416,D706,R118,D799,R424,D615,R384,U185,L338,U14,R576,D901,L734,D417,L62,D254,R784,D973,R987,D848,R32,D72,L535,D633,L668,D664,R308,D474,L418,D39,L473,U388,L518,D544,R118,D948,L844,D956,R605,U14,L948,D78,L689,U443,L996,U932,R81,D879,R556,D633,R131
