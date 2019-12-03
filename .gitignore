@@ -1,1 +1,4 @@
 cookie
+ext/
+lib/
+!lib/intcode.rb
