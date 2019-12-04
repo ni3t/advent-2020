@@ -3,9 +3,19 @@
 
 low, high = DATA.each_line.first.split("-").map(&:to_i)
 
+class Array
+  def sorted?
+    sort == self
+  end
+
+  def indistinct?
+    uniq != self
+  end
+end
+
 (low..high).each do |i|
   digits = i.digits.reverse
-  if digits.uniq != digits && digits.sort == digits
+  if digits.sorted? && digits.indistinct?
     @answer1 += 1
     if digits.chunk(&:itself).any? { |a| a.last.size == 2 }
       @answer2 += 1
