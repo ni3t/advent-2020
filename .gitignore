@@ -2,3 +2,4 @@ cookie
 ext/
 lib/
 !lib/intcode.rb
+!lib/graph.rb
