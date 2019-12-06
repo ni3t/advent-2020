@@ -1,8 +1,5 @@
-require "pry"
 require_relative "lib/da_graph" 
-
 input = DATA.each_line.map(&:strip)
-
 g = DAGraph.new
 
 input.each do |relationship|
