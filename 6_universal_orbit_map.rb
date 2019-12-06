@@ -12,13 +12,14 @@ input.each do |relationship|
   n1.add_child_safe(n2)
 end
 
-g.root = g.nodes.find { |n| n.name == "COM" }
-
-santa = g.nodes.find { |n| n.name == "SAN" }
-you = g.nodes.find { |n| n.name == "YOU" }
+g.root = g.find_node_by_name("COM")
+santa = g.find_node_by_name("SAN")
+you = g.find_node_by_name("YOU")
 
 puts g.nodes.sum(&:depth)
-puts you.path_to(santa).size - 1 # path_to includes current location
+
+# path_to includes current location
+puts you.path_to(santa).size - 1 
 
 
 __END__
