@@ -1,14 +1,3 @@
-# Advent of Code 2019
-
-> I got started two days late this year due to holiday travel.
-
-Notes:
-
-1. Pretty straight forward
-2. Brute force is more than ample here, the instruction set is short and the target window is small.
-
----
-
 ## Instructions
 
 Download the input for a problem:
