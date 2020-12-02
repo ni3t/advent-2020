@@ -8,11 +8,9 @@ raise 'put in a number dumbass' unless @day
 
 @cookie = File.read('cookie')
 TEMPLATE = <<~RUBY.freeze
-  @answer1 = nil
-  @answer2 = nil
+  input = DATA.each_line.map do |line|
   
-  pp @answer1
-  pp @answer2
+  end
   
   __END__
 RUBY
