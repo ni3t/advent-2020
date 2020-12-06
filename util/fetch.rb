@@ -16,7 +16,8 @@ TEMPLATE = <<~RUBY.freeze
 RUBY
 
 def fetch_input
-  HTTParty.get("https://adventofcode.com/#{@year}/day/#{@day}/input", {
+  base_url = "https://adventofcode.com/#{@year}/day/#{@day}"
+  HTTParty.get(base_url + '/input', {
                  headers: {
                    'cookie' => "session=#{@cookie}"
                  }
@@ -24,7 +25,8 @@ def fetch_input
 end
 
 def fetch_title
-  content = HTTParty.get("https://adventofcode.com/#{@year}/day/#{@day}")
+  base_url = "https://adventofcode.com/#{@year}/day/#{@day}"
+  content = HTTParty.get(base_url)
   if content.body =~ /Please don't repeatedly/
     puts 'NOT YET SIR'
     exit
@@ -46,12 +48,14 @@ def write_file
 end
 
 def create_file
+  base_url = "https://adventofcode.com/#{@year}/day/#{@day}"
   if File.exist?(fetch_title)
     puts 'exists'
     exit
   end
   write_file
   puts 'OK GO!'
+  exec("open #{base_url}")
 end
 
 create_file
