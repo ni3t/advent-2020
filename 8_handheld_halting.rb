@@ -1,70 +1,55 @@
-@input = DATA.each_line.map.with_index do |line, i|
+DAT = <<~D.freeze
+  nop +0
+  acc +1
+  jmp +4
+  acc +3
+  jmp -3
+  acc -99
+  acc +1
+  jmp -4
+  acc +6
+D
+
+@input = DATA.each_line.map.with_index do |line, _i|
   op, dir, val = line.match(/^(\D+) (\+|-)(\d+)/).captures
-  [i, op, dir, val].freeze
-end.freeze
+  [op, (dir + val).to_i]
+end.map(&:freeze).freeze
 
-def perform(replace_idx)
-  acc = 0
-  curinst = 0
-  instvisited = []
+MAP = {
+  'acc' => ->(a, v, i) { [a + v, i + 1] },
+  'nop' => ->(a, _v, i) { [a + 0, i + 1] },
+  'jmp' => ->(a, v, i) { [a + 0, v + i] }
+}.freeze
 
+def run(r)
+  a = 0
   i = 0
+  visited = []
   res = loop do
-    j, op, dir, val = @input[curinst]
-    break false if instvisited.include?(j) || i == 20
-    return acc if curinst == @input.size - 1
+    op, v = @input[i]
+    # return false but don't break, for part 2
+    break false if visited.include?(i)
+    break a if i == @input.size - 1
 
-    if op == 'acc'
-      if dir == '-'
-        acc -= val.to_i
-      else
-        acc += val.to_i
-      end
-      instvisited << j
-      curinst += 1
-    elsif op == 'nop'
-      instvisited << j
-      if j == replace_idx
-        if dir == '-'
-          curinst -= val.to_i
-        else
-          curinst += val.to_i
-        end
-      else
-        curinst += 1
-      end
-    elsif op == 'jmp'
-      instvisited << j
-      if j == replace_idx
-        curinst += 1
-      else
-        if dir == '-'
-          curinst -= val.to_i
-        else
-          curinst += val.to_i
-        end
+    visited << i
 
-      end
-    end
+    a, i = if i == r
+             # swap the replacement index
+             MAP[op == 'jmp' ? 'nop' : 'jmp'][a, v, i]
+           else
+             MAP[op][a, v, i]
+           end
   end
-  if res && replace_idx
-    return acc
-  elsif !replace_idx
-    return acc
-  end
-
-  false
+  a if !r || res && r
 end
 
-puts perform(nil)
-to_r = @input.map.with_index { |i, j| %w[jmp nop].include?(i[1]) ? [i[1], j] : nil }.compact
-to_r.map do |f|
-  perform(f[1])
-  # pp [f]
-  # puts perform(f[1])
-  # puts 'END------'
-end.filter { |f| f }.first.tap { |t| puts t }
-
+puts run(nil)
+@input.map.with_index { |i, j| %w[jmp nop].include?(i[0]) ? j : nil }.compact.map do |r|
+  if (v = run(r))
+    puts v
+    exit
+  end
+end
 
 __END__
 acc +17
